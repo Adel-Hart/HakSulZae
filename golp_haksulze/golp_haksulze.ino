@@ -170,6 +170,7 @@ void Check(String strim){
     StaticJsonBuffer<200> jsonBuffer;
     JsonObject& root = jsonBuffer.createObject();
     root["uid"] = strim;
+    Serial.println(strim);
 
     root.printTo(jsondata); // printTo => String변수로 변환
     // Serial.print("jsondata: ");
