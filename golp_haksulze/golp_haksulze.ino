@@ -143,6 +143,71 @@ byte cha_Hoon[] = {
 };
 
 
+byte mat[] = {
+  B00000,
+  B11010,
+  B11011,
+  B11010,
+  B00000,
+  B01010,
+  B10101,
+  B00000
+};
+
+byte it[] = {
+  B00000,
+  B01001,
+  B10101,
+  B01001,
+  B00001,
+  B01010,
+  B10101,
+  B00000
+};
+
+byte ge[] = {
+  B00000,
+  B00000,
+  B11011,
+  B01111,
+  B01011,
+  B01011,
+  B00011,
+  B00000
+};
+
+byte du[] = {
+  B00000,
+  B00000,
+  B11110,
+  B10000,
+  B11110,
+  B00000,
+  B11111,
+  B00000
+};
+
+byte se[] = {
+  B00000,
+  B00011,
+  B01011,
+  B01111,
+  B01011,
+  B10111,
+  B00011,
+  B00000
+};
+
+byte yo[] = {
+  B00000,
+  B01110,
+  B01010,
+  B01110,
+  B00000,
+  B01010,
+  B11111,
+  B00000
+};
 
 //함수 모음
 
@@ -161,7 +226,7 @@ void print_buffer(byte buffer[]){
 
 void Check(String strim){
   tone(pie, 783.9909, 100);
-
+  Serial.println(Crypto(strim));
 
   if (client.connect(server, 4885)) {
     Serial.println("Connecting...");
@@ -195,7 +260,12 @@ void Check(String strim){
     int check_res = line.substring(ind1+1, ind2).toInt(); //결과 값 받기, 정상이면 1, 아니면 0
 
     if(check_res == 1){
-      lcd.print("PASS");
+      lcd.write(4);
+      lcd.write(5);
+      lcd.write(6);
+      lcd.write(7);
+      lcd.write(8);
+      lcd.write(9);
       Success();
     }
     else if(check_res == 2){
@@ -257,7 +327,7 @@ String Crypto(String strim){ //uid 암호화  sha256 사용
   
 
   for (int i = 0; i < 32; i++) {
-    temp = temp + hash[i] + " ";
+    temp = temp + hash[i] + "";
   }
 
 
@@ -323,6 +393,13 @@ void initalize(){
   lcd.createChar(1, cha_Dong); //1 : 동
   lcd.createChar(2, cha_Hoon); //2 : 훈
   lcd.createChar(3, emoji_Heart); //3 : 하트(이모지)
+  lcd.createChar(4, mat); //4: 맛
+  lcd.createChar(5, it); //5: 있
+  lcd.createChar(6, ge); //6: 게
+  lcd.createChar(7, du); //7: 드
+  lcd.createChar(8, se); //8: 세
+  lcd.createChar(9, yo); //9: 요
+
 
   return;
 }

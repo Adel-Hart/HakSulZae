@@ -18,6 +18,7 @@ maria.connect(); //DB 설정
 
 const doit = schedule.scheduleJob('0 0 23 * * *', ()=>{
     maria.query("UPDATE data SET IS_EAT=0");
+    console.log("IS_EAT Initialize Compelete.")
 })  //메일 11시에 IS_EAT 초기화
 
 function csv(grade, clas, num, name, time, month){ //CSV 저장 함수 호출(python으로)
