@@ -44,9 +44,9 @@ Green = 11 <Gre>
 Blue = 10 <Bl>
  
  */
-#define btnLeft 3
-#define btnEnter 4
-#define btnRight 5 
+#define btnLeft 44
+#define btnEnter 40
+#define btnRight 36
  
 #define sda 53
 #define sck 52
@@ -75,8 +75,8 @@ float stat_Voltage; //아두이노 출력 전압
 boolean getIsConnected = false;
 
 unsigned long lastConnectionTime = 0;         // last time you connected to the server, in milliseconds
-const unsigned long postingInterval = 5000L; // delay between updates, in millisecondsunsigned long lastConnectionTime = 0;
-const int WIFI_Initial_time=2000;
+const unsigned long postingInterval = 2000L; // delay between updates, in millisecondsunsigned long lastConnectionTime = 0;
+const int WIFI_Initial_time=1000;
 
 
 
@@ -225,8 +225,7 @@ void print_buffer(byte buffer[]){
 }
 
 void Check(String strim){
-  tone(pie, 783.9909, 100);
-  Serial.println(Crypto(strim));
+  tone(pie, 1479.978, 100);
 
   if (client.connect(server, 4885)) {
     Serial.println("Connecting...");
@@ -242,12 +241,12 @@ void Check(String strim){
     // Serial.println("{\"uid\":\"ardde\"}");
     // Serial.println(jsondata.length());
 
-    client.print(F("POST /check"));
-    client.print(F(" HTTP/1.1\r\n"));
-    client.print(F("Host: 59.0.121.66:4885\r\n"));
-    client.print(F("User-Agent: Arduino\r\n"));
-    client.print(F("Content-Type: application/json\r\n"));
-    client.print(F("Content-Length: "));
+    client.print("POST /check");
+    client.print(" HTTP/1.1\r\n");
+    client.print("Host: 59.0.121.66:4885\r\n");
+    client.print("User-Agent: Arduino\r\n");
+    client.print("Content-Type: application/json\r\n");
+    client.print("Content-Length: ");
     client.println(jsondata.length());
     client.println(); //데이터 전송 구분을 위한 줄 넘김
     client.print(jsondata);
@@ -260,24 +259,19 @@ void Check(String strim){
     int check_res = line.substring(ind1+1, ind2).toInt(); //결과 값 받기, 정상이면 1, 아니면 0
 
     if(check_res == 1){
-      lcd.write(4);
-      lcd.write(5);
-      lcd.write(6);
-      lcd.write(7);
-      lcd.write(8);
-      lcd.write(9);
+      lcd.print("     ENJOY!     ");
       Success();
     }
     else if(check_res == 2){
-      lcd.print("Already USE");
+      lcd.print("   Already USE   ");
       Fail();
 
     }
     else if(check_res == 0){
-      lcd.print("Not Registered");
+      lcd.print(" Not Registered ");
       Fail();
     }
-
+    client.stop();
 
   }
 
@@ -285,6 +279,7 @@ void Check(String strim){
     // if you couldn't make a connection
     Serial.println("Connection failed");
     lcd.print("CONNECTION LOST");
+    Fail();
     getIsConnected = false; 
   }
   
@@ -297,14 +292,14 @@ void Fail(){
   analogWrite(Red, 0);
   analogWrite(Green, 0);
   analogWrite(Blue, 0);
-  tone(pie, 783.9909, 300);
+  tone(pie, 1479.978, 150);
 
   delay(300);
 
   analogWrite(Red, 255);
   analogWrite(Green, 0);
   analogWrite(Blue, 0); //빨간색 출력
-  tone(pie, 783.9909, 300);
+  tone(pie, 1479.978, 300);
 
 }
 
@@ -313,27 +308,8 @@ void Success(){
   analogWrite(Green, 255);
   analogWrite(Blue, 186); //얘쁜 초록색 출력
 
-  tone(pie, 783.9909, 300);
+  tone(pie, 1479.978, 300);
 }
-
-String Crypto(String strim){ //uid 암호화  sha256 사용
-
-
-  String temp;
-  uint8_t *hash;
-  Sha256.init();
-  Sha256.print(strim);
-  hash = Sha256.result();
-  
-
-  for (int i = 0; i < 32; i++) {
-    temp = temp + hash[i] + "";
-  }
-
-
-  return temp;
-}
-
 
 
 
@@ -357,8 +333,7 @@ void initalize(){
   
   WiFi.init(&Serial2);
   if (WiFi.status() == WL_NO_SHIELD) {
-    Serial.println("WiFi shield not present");
-    // don't continue
+    Serial.println("shield not present");
     while (true);
   }
   while (WiFi.status() != WL_CONNECTED) {
@@ -368,9 +343,9 @@ void initalize(){
     status = WiFi.begin(ssid, psw);
   }
 
-  Serial.println("인터넷 연결 성공");
+  Serial.println("Success");
   Serial.println();
-  Serial.println("서버와 연결 합니다...");
+  Serial.println("Connecting with server...");
 
 
 
@@ -435,11 +410,6 @@ void menuPreview(int mode){ //메뉴 화면 미리보기 함수
         lcd.print("INFO");
         lcd.setCursor(5, 1);
         lcd.print("<4/4>");
-        break;
-      case 4:
-        lcd.clear();
-        lcd.setCursor(1, 0);
-        lcd.print("Writing");
         break;
 
   }
@@ -514,103 +484,6 @@ void Info(){ //정보 메뉴
 }
 
 
-void Writing(){ //rfid카드 등록
-  byte buffer[18];
-  byte size = sizeof(buffer);
-
-  byte buffer_uid[4];
-
-  String strim = "";
-
-  lcd.clear();
-  if (!rfid.PICC_IsNewCardPresent()) {
-        return;
-    }
-
-  if (!rfid.PICC_ReadCardSerial()) {
-        return;
-  }
-
-  Serial.println(F("Scanned PICC's UID:"));
-  for ( uint8_t i = 0; i < 4; i++) {
-    buffer_uid[i] = rfid.uid.uidByte[i];
-    strim = strim + buffer_uid[i];
-  }
-
-  MFRC522::MIFARE_Key keyA, keyB; //keyA, keyB 선언
-
-  for (byte i = 0; i<6; i++){
-    keyA.keyByte[i] = 0xFF;
-  }
-
-  byte valueBlockA = 54; //13번 섹터 첫번째 블럭(4번 블럭)에 값을 지정 하기 위해 지정 해놓음
-  byte valueBlockA_2 = 53;
-  byte trailerblock = 55; //13번 섹터의 트레일러블럭인 7번 블럭을 지정 함.
-
-  Serial.println("A키 인증 시작...");
-  byte status; //status에 상태를 저장하기 위함.
-  status = rfid.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, trailerblock, &keyA, &(rfid.uid)); //A키로 rfid인증 시작(&쓴이유 : 전역변수에 구애 받지 않기 위함.)
-  if(status != MFRC522::STATUS_OK){
-    Serial.print("PCD_Authenticate() 실패: ");
-    // Serial.print(rfid.GetStatusCodeName(status));
-    return;
-  }
-
-  Serial.println("1");
-  char tem[64];
-  // strcpy(tem, Crypto(strim).c_str());
-  char *temp_cry = strtok(tem, " ");
-
-  Serial.println("2");
-  // byte value1Block_2[] = {
-  // 0,0,0,0,  0,0,0,0,   0,0,0,0,   0,0,0,0, valueBlockA_2,~valueBlockA_2,valueBlockA_2,~valueBlockA_2
-  // };
-
-  byte value1Block[] = {
-  0,0,0,0,  0,0,0,0,   0,0,0,0,   0,0,0,0, valueBlockA,~valueBlockA,valueBlockA,~valueBlockA
-  };
-
-  for(int i = 0; i<16; i++){
-    value1Block[i] = temp_cry[i];
-  }
-  // for(int i = 15; i<32; i++){
-  //   value1Block_2[i] = temp_cry[i];
-  // }
-
-
-  print_buffer(value1Block);
-  
-  
-  Serial.println("기록중..");
-  print_buffer(value1Block);
-  status = rfid.MIFARE_Write(valueBlockA, value1Block, 16);
-  // status = rfid.MIFARE_Write(valueBlockA_2, value1Block_2, 16);
-  if (status != MFRC522::STATUS_OK)
-  {
-    Serial.print("MIFARE_Write() 실패 :");
-    // Serial.println(rfid.GetStatusCodeName(status));
-    return;
-  }
-
-  Serial.println("읽는 중...");
-  size = sizeof(buffer);
-  status = rfid.MIFARE_Read(valueBlockA, buffer, &size);
-
-  print_buffer(buffer);
-
-  // status = rfid.MIFARE_Read(valueBlockA_2, buffer, &size);
-
-  print_buffer(buffer);
-
-  Serial.println(Crypto(strim));
-
-}
-
-
-
-
-
-
 
 
 void setup() {
@@ -620,10 +493,11 @@ void setup() {
 void loop() {
   //디버그
   stat_Voltage = analogRead(A0) * (5.0 / 1023.0); //아두이노 출력 전압 상태 확인
-  
-
 
   if(inMenu == 0){ //메뉴 선택 화면
+    analogWrite(Red, 0);
+    analogWrite(Green, 0);
+    analogWrite(Blue, 0); //끄기
     if(digitalRead(btnLeft)){ //왼쪽누르면 menu가 0이 아닐때만, -1 하기, 그리고 화면에 반영
       if(menu != 0){
         menu = menu - 1;
@@ -631,7 +505,7 @@ void loop() {
       }
     }
     else if(digitalRead(btnRight)){ //오른쪽 누르면 menu가 최대인 4가 아닐때만, +1 하고 화면에 반영
-      if(menu != 4){
+      if(menu != 3){
         menu = menu + 1;
         menuPreview(menu);
       }
@@ -653,11 +527,6 @@ void loop() {
           inMenu = 1;
           break;
 
-        case 4:
-          Writing();
-          inMenu = 1;
-          break;
-
 
       }
     }
@@ -676,10 +545,6 @@ void loop() {
           break;
         case 3:
           Info();
-          inMenu = 1;
-          break;
-        case 4:
-          Writing();
           inMenu = 1;
           break;
       }

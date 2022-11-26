@@ -4,8 +4,6 @@ const PythonShell = require('python-shell'); //기타
 const today = new Date();
 
 
-
-
 const app = express(); //서버 설정
 const port = 4885;
 
