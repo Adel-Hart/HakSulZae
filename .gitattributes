@@ -1,0 +1,3 @@
+PPT/Noto_Sans_KR.zip filter=lfs diff=lfs merge=lfs -text
+PPT/석식[[:space:]]확인[[:space:]]시스템[[:space:]]설계[[:space:]]방향에[[:space:]]대한[[:space:]]의견.pptx filter=lfs diff=lfs merge=lfs -text
+PPT/학술제[[:space:]]시연[[:space:]]영상.mp4 filter=lfs diff=lfs merge=lfs -text
