@@ -1,14 +1,14 @@
-#include <ArduinoJson.h>
-#include "WiFiEsp.h"
-#include <SoftwareSerial.h>
-#include <LiquidCrystal.h>
-#include <MFRC522.h>
-#include <MFRC522Extended.h>
-#include <SPI.h>
-#include <sha256.h>
+#include <ArduinoJson.h> #json 수정 라이브러리
+#include "WiFiEsp.h" #esp01 모듈 라이브러리
+#include <SoftwareSerial.h> #시리얼 추가 라이브러리
+#include <LiquidCrystal.h> #lcd 라이브러리
+#include <MFRC522.h> #rfid 인식기 라이브러리
+#include <MFRC522Extended.h> 
+#include <SPI.h> #spi 통신 라이브러리 
+#include <sha256.h> #암호화 라이브러리
 #include <String.h>
 
-/*
+/*{핀 정보}
  * sda = 53 <Yellow>
  * sck = 52 <Green>
  * mosi = 51 <Blue>
@@ -67,25 +67,25 @@ LiquidCrystal lcd(22, 23, 28, 29, 30, 31); //lcd모듈 객체화 이름 : lcd
 MFRC522 rfid(sda, rst); //rfid 모듈 객체화 이름 : rfid
 MFRC522::MIFARE_Key key;
 
-int menu = 0; 
-int temlog = 0;
+int menu = 0; //메뉴번호
+int temlog = 0; 
 int inMenu = 0; //메뉴에 들어간 상태
 float stat_Voltage; //아두이노 출력 전압
 
 boolean getIsConnected = false;
 
-unsigned long lastConnectionTime = 0;         // last time you connected to the server, in milliseconds
-const unsigned long postingInterval = 2000L; // delay between updates, in millisecondsunsigned long lastConnectionTime = 0;
+unsigned long lastConnectionTime = 0;         // 마지막 연결 시간
+const unsigned long postingInterval = 2000L; // 업데이트주기
 const int WIFI_Initial_time=1000;
 
 
 
-IPAddress serv(59, 0, 121, 66);
-int PORT = 4885;
+IPAddress serv(59, 0, 121, 66); //서버와 연결
+int PORT = 4885; //서버 포트 (맞춰서 수정하세요)
 
-char ssid[] = "BongSoon_2.4GHz"; //와이파이 이름
-char psw[] = "kimdong2006!"; //비밀번호
-char server[] = "59.0.121.66"; //서버 주소
+char ssid[] = "WIFI NAEM"; //와이파이 이름
+char psw[] = "PASSWORD"; //비밀번호
+char server[] = "SERVER ADRESS"; //서버 주소 맞춰서수정하세요
 int status = WL_IDLE_STATUS;
 
 WiFiEspClient client;
@@ -206,7 +206,7 @@ byte yo[] = {
   B00000,
   B01010,
   B11111,
-  B00000
+  B00000 //사실 쓸데 없음
 };
 
 //함수 모음
@@ -221,19 +221,19 @@ void print_buffer(byte buffer[]){
         Serial.print(buffer[i]);
 
     }
-    Serial.print("}");
+    Serial.print("}"); //버퍼 출력기 사용X
 }
 
-void Check(String strim){
-  tone(pie, 1479.978, 100);
+void Check(String strim){ //밥 먹는지 안먹느닞 감지
+  tone(pie, 1479.978, 100); //카드가 대지면 소리 울리기
 
-  if (client.connect(server, 4885)) {
+  if (client.connect(server, 4885)) { //서버 연결
     Serial.println("Connecting...");
 
-    String jsondata = "";
-    StaticJsonBuffer<200> jsonBuffer;
-    JsonObject& root = jsonBuffer.createObject();
-    root["uid"] = strim;
+    String jsondata = ""; //json 데이터 초기화
+    StaticJsonBuffer<200> jsonBuffer; //json 데이터 크기 설저
+    JsonObject& root = jsonBuffer.createObject(); //json데이터 만들기
+    root["uid"] = strim; //json  데이터에서 uid : strim(uid값)을 넣기
     Serial.println(strim);
 
     root.printTo(jsondata); // printTo => String변수로 변환
@@ -249,12 +249,12 @@ void Check(String strim){
     client.print("Content-Length: ");
     client.println(jsondata.length());
     client.println(); //데이터 전송 구분을 위한 줄 넘김
-    client.print(jsondata);
+    client.print(jsondata); //json의 데이터 전송
     lastConnectionTime = millis();
-    getIsConnected = true;
+    getIsConnected = true; //위는 post통신의 프로토콜
 
     String line = client.readString();
-    int ind1 = line.indexOf('%');
+    int ind1 = line.indexOf('%'); //0,1,2 값 가져오기
     int ind2 = line.indexOf('^');
     int check_res = line.substring(ind1+1, ind2).toInt(); //결과 값 받기, 정상이면 1, 아니면 0
 
