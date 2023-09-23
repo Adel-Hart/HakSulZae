@@ -33,9 +33,8 @@
 >/arduino_code : 아두이노안에 이식되는 코드 파일입니다.  
 >/PPT : 발표 자료입니다.  
 >/example_database : 발표 할 때 썻던, 예시 데이터 베이스 입니다.  
->LICENSE : mit 저작권표시 입니다.  
+>LICENSE : 저작권표시 입니다.
 - - -
 # 저작권
->이 프로젝트와 계획 및 작품의 제작및 총괄자는 김동훈이고 MIT저작권을 준수하여, 사용 및 수정, 분석은 허용하지만, 
->이를 통한 무단 배포는 금지합니다.  
->Copyright 2022. Adel Hart <t2amju1ce.official@gmail.com>
+>이 프로젝트와 계획 및 작품의 제작및 총괄을 맡았습니다. 
+>Copyright 2022. Adel Hart <dongHoon777.kim@gmail.com>
